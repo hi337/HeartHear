@@ -4,19 +4,35 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import serial
 
-# Function to calculate SpO2 based on red and IR signal amplitudes
-def calculate_spo2(red_ratio, ir_ratio):
-    # Coefficients for the empirical formula
-    a = -45.060
-    d = 30.354
-    
-    # Calculate SpO2 using the formula
-    spo2 = (a * (red_ratio) / (ir_ratio) * (red_ratio) / (ir_ratio)) + (d*(red_ratio) / (ir_ratio)) + 94.845
+# Global buffers for data
+red_values = []
+ir_values = []
 
-    return str(spo2)
+# Function to calculate SpO2 based on red and IR signal amplitudes
+def calculate_spo2():
+    global red_values, ir_values
+    
+    # Check if there is enough data
+    if len(red_values) < 150 or len(ir_values) < 150:
+        return 100  # Return 100 when not enough data
+
+    # get the mean of the Red and IR
+    red_dc = sum(red_values[:150]) / 150
+    ir_dc = sum(ir_values[:150]) / 150
+
+    # get the ac content
+    red_ac = max(red_values[:150]) - min(red_values[:150])
+    ir_ac = max(ir_values[:150]) - min(ir_values[:150])
+
+    # Calculate R and SpO2
+    R = (red_ac / red_dc) / (ir_ac / ir_dc)
+    spo2 = 110 - 25 * R
+    
+    return spo2
 
 # Function to read data from serial and update GUI
 def update_data():
+    global red_values, ir_values
     try:
         if ser.in_waiting > 0:
             line = ser.readline().decode().strip().split()
@@ -37,13 +53,24 @@ def update_data():
             elif drowsiness == 0:
                 drowsiness_label.config(text="Awake")
 
+            # Append red and IR values to global arrays only if glasses are on
+            if int(irValue) > 50000:
+                red_values.append(redValue)
+                ir_values.append(irValue)
+                # Keep the array length to a maximum of 150
+                if len(red_values) > 150:
+                    red_values.pop(0)
+                if len(ir_values) > 150:
+                    ir_values.pop(0)
             
-            # print ppg values
-            if (int(irValue) > 50000):
-                ppg_signal.config(text="Ir Value: " + str(irValue) + ", Heart Rate (BPM): " + heartRate + ", SpO2: " + calculate_spo2(redValue, irValue))
+            # Calculate SpO2
+            spo2_value = calculate_spo2()
+
+            # Update GUI
+            if int(irValue) > 50000:
+                ppg_signal.config(text="Ir Value: " + str(irValue) + ", Heart Rate (BPM): " + heartRate + ", SpO2: " + str(spo2_value))
             else:
                 ppg_signal.config(text="Glasses are Off!")
-            
 
             # ecg_signal.config(text=ecgbpm)
 
