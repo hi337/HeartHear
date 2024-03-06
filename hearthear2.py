@@ -70,7 +70,9 @@ def update_data():
             if int(irValue) > 50000:
                 ppg_signal.config(text="Ir Value: " + str(irValue) + ", Heart Rate (BPM): " + heartRate + ", SpO2: " + str(spo2_value))
             else:
+                drowsiness_label.config(text="Glasses are Off!")
                 ppg_signal.config(text="Glasses are Off!")
+                eog_signal.config(text="Glasses are Off!")
 
             # ecg_signal.config(text=ecgbpm)
 

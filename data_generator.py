@@ -2,14 +2,14 @@ import csv
 import random
 
 # Define the number of data entries
-num_entries = 500
+num_entries = 2000
 
 # Define the healthy ranges for BPM and SpO2
-bpm_range = (200, 500)
+bpm_range = (0, 40)
 spo2_range = (0, 93)
 
 # Open a CSV file for writing
-with open('cardiac_arrest.csv', 'w', newline='') as csvfile:
+with open('hypo.csv', 'w', newline='') as csvfile:
     # Define column names
     fieldnames = ['BPM', 'SpO2', 'drowsiness', 'label']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -27,7 +27,7 @@ with open('cardiac_arrest.csv', 'w', newline='') as csvfile:
         drowsiness = 1
         
         # Set label to 0 for healthy person
-        label = 2
+        label = 3
         
         # Write the data entry to the CSV file
         writer.writerow({'BPM': bpm, 'SpO2': spo2, 'drowsiness': drowsiness, 'label': label})
