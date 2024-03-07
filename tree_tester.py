@@ -1,10 +1,8 @@
 import pandas as pd
-import numpy as np
 import joblib
 
 # Load the trained model from the file
-model_file = "decision_tree_model.joblib"
-gbr_model = joblib.load(model_file)
+tree_model = joblib.load("decision_tree_model.joblib")
 
 # Prompt the user for input values
 print("Please enter the following input values:")
@@ -20,7 +18,7 @@ input_data = pd.DataFrame({
 })
 
 # Make predictions using the loaded model
-predicted_label = gbr_model.predict(input_data)
+predicted_label = tree_model.predict(input_data)
 
 # Map predicted label to corresponding diagnosis
 diagnosis_map = {
