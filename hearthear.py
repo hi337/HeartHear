@@ -31,8 +31,8 @@ def calculate_spo2():
         return 100  # Return 100 when not enough data
 
     # get the mean of the Red and IR
-    red_dc = np.sqrt(np.mean(np.square(red_values[:200])))
-    ir_dc = np.sqrt(np.mean(np.square(ir_values[:200])))
+    red_dc = np.mean(red_values[:200])
+    ir_dc = np.mean(ir_values[:200])
 
     # get the ac content
     red_ac = max(red_values[:200]) - min(red_values[:200])
@@ -42,7 +42,7 @@ def calculate_spo2():
     R = (red_ac / red_dc) / (ir_ac / ir_dc)
     spo2 = 110 - 25 * R
     
-    return (spo2 if spo2 <= 100 else 100)
+    return (spo2 if spo2 <= 100 and spo2 >= 0 else 100)
 
 # Function to read data from serial and update GUI
 def update_data():
@@ -72,7 +72,7 @@ def update_data():
                 spo2_value = int(calculate_spo2())
 
                 # Update PPG
-                ppg_signal.config(text="Ir Value: " + str(irValue) + ", SpO2: " + str(spo2_value))
+                ppg_signal.config(text="Ir Value: " + str(irValue) + ", Red Value: " + str(redValue) + ", SpO2: " + str(spo2_value))
 
                 # update eog signal
                 eog_signal.config(text="EOG signal: " + str(signal) + ", Awake or Drowsy?: " + ("Drowsy" if drowsiness == 1 else "Awake"))
@@ -109,17 +109,25 @@ ser = serial.Serial('COM3', baudrate=115200)
 root = tk.Tk()
 root.title("EOG Signal and Drowsiness Detection")
 
-# Create label to display drowsiness status
-eog_signal = tk.Label(root, text="", font=("Helvetica", 40))
+# Configure background color
+root.configure(bg="white")
+
+# Add logo image at the top
+logo_image = tk.PhotoImage(file=".//pics//logo.png")
+logo_label = tk.Label(root, image=logo_image, bg="white")
+logo_label.pack(pady=10)
+
+# Create labels to display sensory data and results
+eog_signal = tk.Label(root, text="", font=("Helvetica", 40), fg="#1654b8", bg="#ff7573")
 eog_signal.pack(pady=10)
 
-ppg_signal = tk.Label(root, text="", font=("Helvetica", 40))
+ppg_signal = tk.Label(root, text="", font=("Helvetica", 40), fg="#1654b8", bg="#ff7573")
 ppg_signal.pack(pady=10)
 
-ecg_signal = tk.Label(root, text="", font=("Helvetica", 40))
+ecg_signal = tk.Label(root, text="", font=("Helvetica", 40), fg="#1654b8", bg="#ff7573")
 ecg_signal.pack(pady=10)
 
-predicted_outcome = tk.Label(root, text="", font=("Helvetica", 40))
+predicted_outcome = tk.Label(root, text="", font=("Helvetica", 40), fg="#1654b8", bg="#ff7573")
 predicted_outcome.pack(pady=10)
 
 # Start updating data
