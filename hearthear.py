@@ -107,7 +107,7 @@ ser = serial.Serial('COM3', baudrate=115200)
 
 # Create GUI window
 root = tk.Tk()
-root.title("EOG Signal and Drowsiness Detection")
+root.title("HeartHear")
 
 # Configure background color
 root.configure(bg="white")
